@@ -13,8 +13,13 @@ import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography, { TypographyProps } from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 
 import { IS_DEV } from 'constants/environment';
+import { US_STATES } from 'constants/enums';
 
 import Grid from 'components/layout/Grid';
 
@@ -150,11 +155,21 @@ const RatingInformation = () => {
               name={RATING_INFO_FORM_KEYS.city}
               disabled={isLoading}
             />
-            <GridTextField
-              label="State"
-              gridArea="state"
+            <Controller
               name={RATING_INFO_FORM_KEYS.state}
-              disabled={isLoading}
+              control={useFormMethods.control}
+              render={({ field }) => (
+                <FormControl>
+                  <InputLabel id="state-dropdown">State</InputLabel>
+                  <Select labelId="state-dropdown" label="State" {...field}>
+                    {US_STATES.map((state) => (
+                      <MenuItem key={state.code} value={state.code}>
+                        {state.fullName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
             />
             <GridTextField
               label="Zip code"

@@ -3,6 +3,8 @@ import Box from '@mui/material/Box';
 import { amber } from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 
+import * as paths from 'constants/paths';
+
 import QuoteOverview from 'pages/QuoteOverview';
 import RatingInformation from 'pages/RatingInformation';
 
@@ -24,12 +26,13 @@ function App() {
         fontWeight="700"
         marginBottom="2rem"
         color="#214e34"
+        textAlign="center"
       >
         Rocket Insurance
       </Typography>
       <Switch>
-        <Route path="/rating-information" component={RatingInformation} />
-        <Route path="/quote-overview" component={QuoteOverview} />
+        <Route path={paths.RATING_INFORMATION} component={RatingInformation} />
+        <Route path={paths.QUOTE_OVERVIEW} component={QuoteOverview} />
         <Route path="*">
           <Redirect to="/rating-information" />
         </Route>

@@ -1,4 +1,4 @@
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import {
   Controller,
   FormProvider,
@@ -15,11 +15,19 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import Button from '@mui/material/Button';
+
+import LoadingOverlay from 'components/LoadingOverlay';
 
 import { RATING_INFORMATION } from 'constants/paths';
 import { IS_DEV } from 'constants/environment';
 
-import { useAppState } from 'services/rq-hooks';
+import {
+  useAppState,
+  useUpdateQuote,
+  UpdateQuoteCoverageVariableKeys,
+  UseUpdateQuotePayload,
+} from 'services/rq-hooks';
 
 import { formatCurrency } from 'utils/format';
 
@@ -29,7 +37,9 @@ interface QuotingOverviewFormData {
 }
 
 const QuotingOverview = () => {
-  const { state } = useAppState();
+  const { clearState, state } = useAppState();
+  const { isLoading, mutate: updateQuote } = useUpdateQuote();
+  const { push } = useHistory();
   const useFormMethods = useForm<QuotingOverviewFormData>({
     defaultValues: {
       deductible: state?.quote?.variable_selections?.deductible,
@@ -41,7 +51,11 @@ const QuotingOverview = () => {
 
   return (
     <>
-      <Paper elevation={1} sx={{ width: '100%', maxWidth: '30rem' }}>
+      <Paper
+        elevation={1}
+        sx={{ width: '100%', maxWidth: '30rem', position: 'relative' }}
+      >
+        {isLoading && <LoadingOverlay message="Updating quote" />}
         <Box padding="2rem 1.5rem">
           <Typography variant="h4" component="h2" textAlign="center">
             Your Quote
@@ -75,9 +89,27 @@ const QuotingOverview = () => {
             Adjust policy coverage variables
           </Typography>
           <FormProvider {...useFormMethods}>
-            <PolicyCoverageVariableSelect name="deductible" />
-            <PolicyCoverageVariableSelect name="asteroid_collision" />
+            <PolicyCoverageVariableSelect
+              name="deductible"
+              onChange={updateQuote}
+              disabled={isLoading}
+            />
+            <PolicyCoverageVariableSelect
+              name="asteroid_collision"
+              onChange={updateQuote}
+              disabled={isLoading}
+            />
           </FormProvider>
+          <Box display="flex" justifyContent="center">
+            <Button
+              onClick={() => {
+                push(RATING_INFORMATION);
+                clearState();
+              }}
+            >
+              Restart quote
+            </Button>
+          </Box>
         </Box>
       </Paper>
       {IS_DEV && <ReactHookFormDevtools control={useFormMethods.control} />}
@@ -86,13 +118,17 @@ const QuotingOverview = () => {
 };
 
 interface PolicyCoverageVariableSelectProps {
-  name: 'deductible' | 'asteroid_collision';
+  disabled?: boolean;
+  name: UpdateQuoteCoverageVariableKeys;
+  onChange(data: UseUpdateQuotePayload): void;
 }
 
 const PolicyCoverageVariableSelect = ({
+  disabled = false,
   name,
+  onChange,
 }: PolicyCoverageVariableSelectProps) => {
-  const { control } = useFormContext();
+  const { control } = useFormContext<QuotingOverviewFormData>();
   const { state } = useAppState();
 
   return (
@@ -108,7 +144,13 @@ const PolicyCoverageVariableSelect = ({
             <Select
               labelId={`${name}-select`}
               label={state?.quote?.variable_options?.[name]?.title}
+              disabled={disabled}
               {...field}
+              onChange={(e) => {
+                field.onChange(e);
+                // TODO fix to remove casting
+                onChange({ [name]: e.target.value } as UseUpdateQuotePayload);
+              }}
             >
               {(state?.quote?.variable_options?.[name]?.values ?? []).map(
                 (val) => (

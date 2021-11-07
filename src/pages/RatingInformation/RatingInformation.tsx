@@ -12,11 +12,12 @@ import Paper from '@mui/material/Paper';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography, { TypographyProps } from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+
+import LoadingOverlay from 'components/LoadingOverlay';
 
 import { IS_DEV } from 'constants/environment';
 import { US_STATES } from 'constants/enums';
@@ -63,20 +64,7 @@ const RatingInformation = () => {
         position: 'relative',
       }}
     >
-      {isLoading && (
-        <Box
-          position="absolute"
-          height="100%"
-          width="100%"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          zIndex="100"
-          sx={{ backgroundColor: 'white', opacity: 0.5 }}
-        >
-          <CircularProgress />
-        </Box>
-      )}
+      {isLoading && <LoadingOverlay message="Generating quote" />}
       <FormProvider {...useFormMethods}>
         <form
           onSubmit={useFormMethods.handleSubmit((data) =>
@@ -191,7 +179,7 @@ const RatingInformation = () => {
                 sx={{ width: { xs: '100%', md: 'fit-content' } }}
                 disabled={isLoading}
               >
-                {isLoading ? 'Generating quote...' : 'Get quote'}
+                Get quote
               </Button>
             </Box>
           </Grid>

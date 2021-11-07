@@ -6,6 +6,8 @@ import {
   useFormContext,
 } from 'react-hook-form';
 import { DevTool as ReactHookFormDevtools } from '@hookform/devtools';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -16,6 +18,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import FormHelperText from '@mui/material/FormHelperText';
 
 import LoadingOverlay from 'components/LoadingOverlay';
 
@@ -45,15 +48,18 @@ const RatingInformation = () => {
   const { mutate: createQuote, isLoading } = useCreateQuote();
   const useFormMethods = useForm<RatingInformationFormData>({
     defaultValues: {
-      [RATING_INFO_FORM_KEYS.firstName]: 'Test',
-      [RATING_INFO_FORM_KEYS.lastName]: 'One',
-      [RATING_INFO_FORM_KEYS.line1]: '123 A Street',
+      [RATING_INFO_FORM_KEYS.firstName]: '',
+      [RATING_INFO_FORM_KEYS.lastName]: '',
+      [RATING_INFO_FORM_KEYS.line1]: '',
       [RATING_INFO_FORM_KEYS.line2]: '',
-      [RATING_INFO_FORM_KEYS.city]: 'SLC',
-      [RATING_INFO_FORM_KEYS.state]: 'UT',
-      [RATING_INFO_FORM_KEYS.zipCode]: '84101',
+      [RATING_INFO_FORM_KEYS.city]: '',
+      [RATING_INFO_FORM_KEYS.state]: '',
+      [RATING_INFO_FORM_KEYS.zipCode]: '',
     },
+    resolver: yupResolver(formValidation),
   });
+  const stateSelectError =
+    useFormMethods?.formState?.errors?.[RATING_INFO_FORM_KEYS.state]?.message;
 
   return (
     <Paper
@@ -89,26 +95,26 @@ const RatingInformation = () => {
             }}
             gridTemplateAreas={{
               xs: `
-          "nameTitle"
-          "firstName"
-          "lastName"
-          "addressTitle"
-          "line1"
-          "line2"
-          "city"
-          "state"
-          "zipCode"
-          "submitButton"
-        `,
+                "nameTitle"
+                "firstName"
+                "lastName"
+                "addressTitle"
+                "line1"
+                "line2"
+                "city"
+                "state"
+                "zipCode"
+                "submitButton"
+              `,
               md: `
-          "nameTitle nameTitle"
-          "firstName lastName"
-          "addressTitle addressTitle"
-          "line1 line1"
-          "line2 city"
-          "state zipCode"
-          "submitButton submitButton"
-        `,
+                "nameTitle nameTitle"
+                "firstName lastName"
+                "addressTitle addressTitle"
+                "line1 line1"
+                "line2 city"
+                "state zipCode"
+                "submitButton submitButton"
+              `,
             }}
           >
             <GridSectionTitle gridArea="nameTitle">Name</GridSectionTitle>
@@ -149,13 +155,21 @@ const RatingInformation = () => {
               render={({ field }) => (
                 <FormControl>
                   <InputLabel id="state-dropdown">State</InputLabel>
-                  <Select labelId="state-dropdown" label="State" {...field}>
+                  <Select
+                    labelId="state-dropdown"
+                    label="State"
+                    error={Boolean(stateSelectError)}
+                    {...field}
+                  >
                     {US_STATES.map((state) => (
                       <MenuItem key={state.code} value={state.code}>
                         {state.fullName}
                       </MenuItem>
                     ))}
                   </Select>
+                  {Boolean(stateSelectError) && (
+                    <FormHelperText error>{stateSelectError}</FormHelperText>
+                  )}
                 </FormControl>
               )}
             />
@@ -177,7 +191,11 @@ const RatingInformation = () => {
                 variant="contained"
                 type="submit"
                 sx={{ width: { xs: '100%', md: 'fit-content' } }}
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  (useFormMethods.formState.isSubmitted &&
+                    !useFormMethods.formState.isValid)
+                }
               >
                 Get quote
               </Button>
@@ -203,13 +221,24 @@ const GridTextField = ({
   name,
   ...rest
 }: PropsWithGridArea<GridTextFieldProps>) => {
-  const { control } = useFormContext();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
+  const errorMessage = errors?.[name]?.message;
   return (
     <Controller
       name={name}
       control={control}
       render={({ field }) => (
-        <TextField variant="outlined" sx={{ gridArea }} {...field} {...rest} />
+        <TextField
+          variant="outlined"
+          error={Boolean(errorMessage)}
+          helperText={errorMessage}
+          sx={{ gridArea }}
+          {...field}
+          {...rest}
+        />
       )}
     />
   );
@@ -224,5 +253,28 @@ const GridSectionTitle: FC<PropsWithGridArea<TypographyProps>> = ({
     {children}
   </Typography>
 );
+
+const formValidation = yup.object({
+  [RATING_INFO_FORM_KEYS.firstName]: yup
+    .string()
+    .required('Please enter a first name to continue.'),
+  [RATING_INFO_FORM_KEYS.lastName]: yup
+    .string()
+    .required('Please enter a last name to continue.'),
+  [RATING_INFO_FORM_KEYS.line1]: yup
+    .string()
+    .required('Please enter a street address to continue.'),
+  [RATING_INFO_FORM_KEYS.line2]: yup.string(),
+  [RATING_INFO_FORM_KEYS.city]: yup
+    .string()
+    .required('Please enter a city to continue.'),
+  [RATING_INFO_FORM_KEYS.state]: yup
+    .string()
+    .required('Please select a state to continue.'),
+  [RATING_INFO_FORM_KEYS.zipCode]: yup
+    .string()
+    .matches(/^\d{5}$/, 'Please enter a valid, 5-digit zip code to continue.')
+    .required('Please enter a zip code to continue.'),
+});
 
 export default RatingInformation;

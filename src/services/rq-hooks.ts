@@ -5,11 +5,13 @@ import { QUOTE_OVERVIEW } from 'constants/paths';
 
 import { createQuote, CreateQuotePayload, QuoteResponse } from './quotes';
 
-// TODO type app state
-export const useAppState = () => {
+export const useAppState = (): {
+  state: QuoteResponse | undefined;
+  updateState: (newData: QuoteResponse) => void;
+} => {
   const queryClient = useQueryClient();
   const { data: state } = useQuery('quote', () =>
-    queryClient.getQueryData('quote')
+    queryClient.getQueryData<QuoteResponse>('quote')
   );
   const updateState = (newState: any) =>
     queryClient.setQueryData('quote', newState);

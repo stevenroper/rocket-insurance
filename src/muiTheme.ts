@@ -10,12 +10,6 @@ const theme: ThemeOptions = {
   },
   components: {
     MuiButton: {
-      styleOverrides: {
-        containedSecondary: {
-          color: DARK_GREEN,
-          fontWeight: 700,
-        },
-      },
       defaultProps: {
         color: 'secondary',
       },

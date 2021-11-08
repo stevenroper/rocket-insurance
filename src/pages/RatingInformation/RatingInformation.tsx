@@ -159,6 +159,7 @@ const RatingInformation = () => {
                       label="State"
                       error={Boolean(stateSelectError)}
                       MenuProps={{ PaperProps: { sx: { maxHeight: '20rem' } } }}
+                      inputProps={{ 'data-cy': 'state-select' }}
                       {...field}
                     >
                       {US_STATES.map((state) => (
@@ -238,6 +239,7 @@ const GridTextField = ({
           error={Boolean(errorMessage)}
           helperText={errorMessage}
           sx={{ gridArea }}
+          inputProps={{ 'data-cy': `${name}-input` }}
           {...field}
           {...rest}
         />

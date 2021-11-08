@@ -78,6 +78,7 @@ const QuotingOverview = () => {
               component="p"
               fontWeight="500"
               color={theme.palette.primary.main}
+              data-cy="premium-value"
             >
               {formatCurrency(state?.quote?.premium)}
             </Typography>
@@ -148,6 +149,7 @@ const PolicyCoverageVariableSelect = ({
               labelId={`${name}-select`}
               label={state?.quote?.variable_options?.[name]?.title}
               disabled={disabled}
+              inputProps={{ 'data-cy': `${name}-select` }}
               {...field}
               onChange={(e) => {
                 field.onChange(e);

@@ -32,12 +32,15 @@
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "predeploy": "CI=true yarn test && yarn build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:cypress/recommended"
     ]
   },
   "browserslist": {
@@ -55,6 +58,8 @@
   "devDependencies": {
     "@hookform/devtools": "^4.0.1",
     "@testing-library/react-hooks": "^7.0.2",
+    "cypress": "^8.7.0",
+    "eslint-plugin-cypress": "^2.12.1",
     "gh-pages": "^3.2.3",
     "prettier": "^2.4.1",
     "react-app-rewired": "^2.1.8"

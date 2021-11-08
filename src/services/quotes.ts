@@ -56,6 +56,11 @@ export interface QuoteResponse {
   };
 }
 
+const handleResponse = (res: Response) => {
+  if (!res.ok) throw new Error(`Network error: ${res.status}`);
+  return res.json();
+};
+
 export const createQuote = async (
   payload: CreateQuotePayload
 ): Promise<QuoteResponse> => {
@@ -64,7 +69,7 @@ export const createQuote = async (
     method: 'POST',
     body: JSON.stringify(payload),
   });
-  return res.json();
+  return handleResponse(res);
 };
 
 export const updateQuote = async (
@@ -76,5 +81,5 @@ export const updateQuote = async (
     method: 'PUT',
     body: JSON.stringify(payload),
   });
-  return res.json();
+  return handleResponse(res);
 };

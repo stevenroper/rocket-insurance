@@ -8,7 +8,6 @@ import {
 import { DevTool as ReactHookFormDevtools } from '@hookform/devtools';
 
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { grey } from '@mui/material/colors';
 import Select from '@mui/material/Select';
@@ -17,7 +16,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 
-import LoadingOverlay from 'components/LoadingOverlay';
+import FormCard from 'components/FormCard';
 
 import { RATING_INFORMATION } from 'constants/paths';
 import { IS_DEV } from 'constants/environment';
@@ -38,7 +37,7 @@ interface QuotingOverviewFormData {
 
 const QuotingOverview = () => {
   const { clearState, state } = useAppState();
-  const { isLoading, mutate: updateQuote } = useUpdateQuote();
+  const { isError, isLoading, mutate: updateQuote } = useUpdateQuote();
   const { push } = useHistory();
   const useFormMethods = useForm<QuotingOverviewFormData>({
     defaultValues: {
@@ -51,11 +50,12 @@ const QuotingOverview = () => {
 
   return (
     <>
-      <Paper
-        elevation={1}
-        sx={{ width: '100%', maxWidth: '30rem', position: 'relative' }}
+      <FormCard
+        isLoading={isLoading}
+        loadingMessage="Updating quote"
+        maxWidth="30rem"
+        showErrorMessage={isError}
       >
-        {isLoading && <LoadingOverlay message="Updating quote" />}
         <Box padding="2rem 1.5rem">
           <Typography variant="h4" component="h2" textAlign="center">
             Your Quote
@@ -111,7 +111,7 @@ const QuotingOverview = () => {
             </Button>
           </Box>
         </Box>
-      </Paper>
+      </FormCard>
       {IS_DEV && <ReactHookFormDevtools control={useFormMethods.control} />}
     </>
   );

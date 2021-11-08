@@ -10,7 +10,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography, { TypographyProps } from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -20,7 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 
-import LoadingOverlay from 'components/LoadingOverlay';
+import FormCard from 'components/FormCard';
 
 import { IS_DEV } from 'constants/environment';
 import { US_STATES } from 'constants/enums';
@@ -45,7 +44,7 @@ type RatingInformationFormData = Record<
 >;
 
 const RatingInformation = () => {
-  const { mutate: createQuote, isLoading } = useCreateQuote();
+  const { mutate: createQuote, isLoading, isError } = useCreateQuote();
   const useFormMethods = useForm<RatingInformationFormData>({
     defaultValues: {
       [RATING_INFO_FORM_KEYS.firstName]: '',
@@ -62,39 +61,37 @@ const RatingInformation = () => {
     useFormMethods?.formState?.errors?.[RATING_INFO_FORM_KEYS.state]?.message;
 
   return (
-    <Paper
-      elevation={1}
-      sx={{
-        width: '100%',
-        maxWidth: '40rem',
-        position: 'relative',
-      }}
-    >
-      {isLoading && <LoadingOverlay message="Generating quote" />}
-      <FormProvider {...useFormMethods}>
-        <form
-          onSubmit={useFormMethods.handleSubmit((data) =>
-            createQuote({
-              first_name: data[RATING_INFO_FORM_KEYS.firstName],
-              last_name: data[RATING_INFO_FORM_KEYS.lastName],
-              address: {
-                line_1: data[RATING_INFO_FORM_KEYS.line1],
-                line_2: data[RATING_INFO_FORM_KEYS.line2],
-                city: data[RATING_INFO_FORM_KEYS.city],
-                region: data[RATING_INFO_FORM_KEYS.state],
-                postal: data[RATING_INFO_FORM_KEYS.zipCode],
-              },
-            })
-          )}
-        >
-          <Grid
-            padding="2rem 1.5rem"
-            gridTemplateColumns={{
-              xs: '1fr',
-              md: '1fr 1fr',
-            }}
-            gridTemplateAreas={{
-              xs: `
+    <>
+      <FormCard
+        isLoading={isLoading}
+        loadingMessage="Generating quote"
+        maxWidth="40rem"
+        showErrorMessage={isError}
+      >
+        <FormProvider {...useFormMethods}>
+          <form
+            onSubmit={useFormMethods.handleSubmit((data) =>
+              createQuote({
+                first_name: data[RATING_INFO_FORM_KEYS.firstName],
+                last_name: data[RATING_INFO_FORM_KEYS.lastName],
+                address: {
+                  line_1: data[RATING_INFO_FORM_KEYS.line1],
+                  line_2: data[RATING_INFO_FORM_KEYS.line2],
+                  city: data[RATING_INFO_FORM_KEYS.city],
+                  region: data[RATING_INFO_FORM_KEYS.state],
+                  postal: data[RATING_INFO_FORM_KEYS.zipCode],
+                },
+              })
+            )}
+          >
+            <Grid
+              padding="2rem 1.5rem"
+              gridTemplateColumns={{
+                xs: '1fr',
+                md: '1fr 1fr',
+              }}
+              gridTemplateAreas={{
+                xs: `
                 "nameTitle"
                 "firstName"
                 "lastName"
@@ -106,7 +103,7 @@ const RatingInformation = () => {
                 "zipCode"
                 "submitButton"
               `,
-              md: `
+                md: `
                 "nameTitle nameTitle"
                 "firstName lastName"
                 "addressTitle addressTitle"
@@ -115,96 +112,99 @@ const RatingInformation = () => {
                 "state zipCode"
                 "submitButton submitButton"
               `,
-            }}
-          >
-            <GridSectionTitle gridArea="nameTitle">Name</GridSectionTitle>
-            <GridTextField
-              label="First name"
-              gridArea="firstName"
-              name={RATING_INFO_FORM_KEYS.firstName}
-              disabled={isLoading}
-            />
-            <GridTextField
-              label="Last name"
-              gridArea="lastName"
-              name={RATING_INFO_FORM_KEYS.lastName}
-              disabled={isLoading}
-            />
-            <GridSectionTitle gridArea="addressTitle">Address</GridSectionTitle>
-            <GridTextField
-              label="Street address"
-              gridArea="line1"
-              name={RATING_INFO_FORM_KEYS.line1}
-              disabled={isLoading}
-            />
-            <GridTextField
-              label="Apartment, unit, suite"
-              gridArea="line2"
-              name={RATING_INFO_FORM_KEYS.line2}
-              disabled={isLoading}
-            />
-            <GridTextField
-              label="City"
-              gridArea="city"
-              name={RATING_INFO_FORM_KEYS.city}
-              disabled={isLoading}
-            />
-            <Controller
-              name={RATING_INFO_FORM_KEYS.state}
-              control={useFormMethods.control}
-              render={({ field }) => (
-                <FormControl>
-                  <InputLabel id="state-dropdown">State</InputLabel>
-                  <Select
-                    labelId="state-dropdown"
-                    label="State"
-                    error={Boolean(stateSelectError)}
-                    {...field}
-                  >
-                    {US_STATES.map((state) => (
-                      <MenuItem key={state.code} value={state.code}>
-                        {state.fullName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {Boolean(stateSelectError) && (
-                    <FormHelperText error>{stateSelectError}</FormHelperText>
-                  )}
-                </FormControl>
-              )}
-            />
-            <GridTextField
-              label="Zip code"
-              gridArea="zipCode"
-              name={RATING_INFO_FORM_KEYS.zipCode}
-              disabled={isLoading}
-            />
-            <Box
-              display="flex"
-              justifyContent="center"
-              marginTop="1rem"
-              sx={{
-                gridArea: 'submitButton',
               }}
             >
-              <Button
-                variant="contained"
-                type="submit"
-                sx={{ width: { xs: '100%', md: 'fit-content' } }}
-                disabled={
-                  isLoading ||
-                  (useFormMethods.formState.isSubmitted &&
-                    !useFormMethods.formState.isValid)
-                }
+              <GridSectionTitle gridArea="nameTitle">Name</GridSectionTitle>
+              <GridTextField
+                label="First name"
+                gridArea="firstName"
+                name={RATING_INFO_FORM_KEYS.firstName}
+                disabled={isLoading}
+              />
+              <GridTextField
+                label="Last name"
+                gridArea="lastName"
+                name={RATING_INFO_FORM_KEYS.lastName}
+                disabled={isLoading}
+              />
+              <GridSectionTitle gridArea="addressTitle">
+                Address
+              </GridSectionTitle>
+              <GridTextField
+                label="Street address"
+                gridArea="line1"
+                name={RATING_INFO_FORM_KEYS.line1}
+                disabled={isLoading}
+              />
+              <GridTextField
+                label="Apartment, unit, suite"
+                gridArea="line2"
+                name={RATING_INFO_FORM_KEYS.line2}
+                disabled={isLoading}
+              />
+              <GridTextField
+                label="City"
+                gridArea="city"
+                name={RATING_INFO_FORM_KEYS.city}
+                disabled={isLoading}
+              />
+              <Controller
+                name={RATING_INFO_FORM_KEYS.state}
+                control={useFormMethods.control}
+                render={({ field }) => (
+                  <FormControl>
+                    <InputLabel id="state-dropdown">State</InputLabel>
+                    <Select
+                      labelId="state-dropdown"
+                      label="State"
+                      error={Boolean(stateSelectError)}
+                      {...field}
+                    >
+                      {US_STATES.map((state) => (
+                        <MenuItem key={state.code} value={state.code}>
+                          {state.fullName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {Boolean(stateSelectError) && (
+                      <FormHelperText error>{stateSelectError}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+              <GridTextField
+                label="Zip code"
+                gridArea="zipCode"
+                name={RATING_INFO_FORM_KEYS.zipCode}
+                disabled={isLoading}
+              />
+              <Box
+                display="flex"
+                justifyContent="center"
+                marginTop="1rem"
+                sx={{
+                  gridArea: 'submitButton',
+                }}
               >
-                Get quote
-              </Button>
-            </Box>
-          </Grid>
-          {IS_DEV && <ReactHookFormDevtools control={useFormMethods.control} />}
-        </form>
-      </FormProvider>
-    </Paper>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  sx={{ width: { xs: '100%', md: 'fit-content' } }}
+                  disabled={
+                    isLoading ||
+                    (useFormMethods.formState.isSubmitted &&
+                      !useFormMethods.formState.isValid)
+                  }
+                >
+                  Get quote
+                </Button>
+              </Box>
+            </Grid>
+          </form>
+        </FormProvider>
+      </FormCard>
+      {IS_DEV && <ReactHookFormDevtools control={useFormMethods.control} />}
+    </>
   );
 };
 

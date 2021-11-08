@@ -158,6 +158,7 @@ const RatingInformation = () => {
                       labelId="state-dropdown"
                       label="State"
                       error={Boolean(stateSelectError)}
+                      MenuProps={{ PaperProps: { sx: { maxHeight: '20rem' } } }}
                       {...field}
                     >
                       {US_STATES.map((state) => (

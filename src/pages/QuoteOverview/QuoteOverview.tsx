@@ -15,6 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
+import { useTheme } from '@mui/material/styles';
 
 import FormCard from 'components/FormCard';
 
@@ -45,6 +46,7 @@ const QuotingOverview = () => {
       asteroid_collision: state?.quote?.variable_selections?.asteroid_collision,
     },
   });
+  const theme = useTheme();
 
   if (!state?.quote) return <Redirect to={RATING_INFORMATION} />;
 
@@ -75,7 +77,7 @@ const QuotingOverview = () => {
               variant="h3"
               component="p"
               fontWeight="500"
-              color="#214e34"
+              color={theme.palette.primary.main}
             >
               {formatCurrency(state?.quote?.premium)}
             </Typography>
@@ -102,6 +104,7 @@ const QuotingOverview = () => {
           </FormProvider>
           <Box display="flex" justifyContent="center">
             <Button
+              color="primary"
               onClick={() => {
                 push(RATING_INFORMATION);
                 clearState();

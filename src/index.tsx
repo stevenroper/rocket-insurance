@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom';
 import { HashRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
+import { createTheme } from '@mui/material/styles';
+
+import muiTheme from './muiTheme';
 
 import App from './App';
 import 'index.css';
@@ -13,7 +17,9 @@ ReactDOM.render(
   <React.StrictMode>
     <HashRouter>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <ThemeProvider theme={createTheme(muiTheme)}>
+          <App />
+        </ThemeProvider>
         <ReactQueryDevtools />
       </QueryClientProvider>
     </HashRouter>

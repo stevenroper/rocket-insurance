@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper';
 import LoadingOverlay from 'components/LoadingOverlay';
 import ErrorAlert from 'components/ErrorAlert';
 
-interface FormCardProps {
+export interface FormCardProps {
   isLoading?: boolean;
   loadingMessage?: string;
   maxWidth: string;

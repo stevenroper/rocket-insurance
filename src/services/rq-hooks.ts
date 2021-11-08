@@ -15,9 +15,10 @@ export const useAppState = (): {
   state: QuoteResponse | undefined;
   updateState: (newData: QuoteResponse) => void;
   clearState: () => void;
+  isSuccess: boolean;
 } => {
   const queryClient = useQueryClient();
-  const { data: state } = useQuery(
+  const { data: state, isSuccess } = useQuery(
     'quote',
     () => queryClient.getQueryData<QuoteResponse>('quote'),
     { staleTime: Infinity, cacheTime: Infinity }
@@ -26,7 +27,7 @@ export const useAppState = (): {
     queryClient.setQueryData('quote', newState);
   const clearState = () => queryClient.removeQueries('quote');
 
-  return { clearState, state, updateState };
+  return { clearState, state, updateState, isSuccess };
 };
 
 export const useCreateQuote = () => {

@@ -24,7 +24,7 @@ import FormCard from 'components/FormCard';
 import { IS_DEV } from 'constants/environment';
 import { US_STATES } from 'constants/enums';
 
-import Grid from 'components/layout/Grid';
+import Grid from 'components/Grid';
 
 import { useCreateQuote } from 'services/rq-hooks';
 
@@ -233,6 +233,7 @@ const GridTextField = ({
       control={control}
       render={({ field }) => (
         <TextField
+          id={name}
           variant="outlined"
           error={Boolean(errorMessage)}
           helperText={errorMessage}
